@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "591042846556",
+    "firebase_url": "https://motor-boyutlandirma-asistani-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "motor-boyutlandirma-asistani",
+    "storage_bucket": "motor-boyutlandirma-asistani.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591042846556:android:7be6dea2c63e8cf0edab99",
+        "android_client_info": {
+          "package_name": "com.sila.motor_asistani"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC_kJmsB9uKX_KtgeviNm9TzpjQoyzduE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
