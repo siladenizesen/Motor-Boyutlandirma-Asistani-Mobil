@@ -2,6 +2,7 @@ import 'dart:math';
 import '../models/giris_parametreleri.dart';
 import '../models/motor_model.dart';
 import '../models/oneri_sonucu.dart';
+import 'ml_tahmin_servisi.dart';
 
 class HesaplamaMotoru {
   static double motorTarafiTork(
@@ -198,9 +199,22 @@ class HesaplamaMotoru {
       if (torkMarji > 60) uyarilar.add('Oversizing riski — tork %${torkMarji.toStringAsFixed(0)} fazla');
       if (giris.ortamSicakligiC > 35) uyarilar.add('Sıcak ortam — soğutmaya dikkat');
 
+      final mlGirdi = MlTahminServisi.girdiHazirla(
+        motorTNom: motor.nominalTorkNm,
+        motorTMax: motor.maxTorkNm,
+        motorNMax: motor.maxHizRpm,
+        motorPNom: motor.nominalGucKw,
+        tRmsGuvenlikli: ihtiyac.guvenlikliTorkNm,
+        nMaxIhtiyac: ihtiyac.motorTarafiMaxHizRpm,
+        pIhtiyacKw: ihtiyac.ortalamaGucKw,
+        tAmb: giris.ortamSicakligiC,
+      );
+      final mlSkoru = MlTahminServisi.tahminEt(mlGirdi);
+
       oneriler.add(OneriSonucu(
         motor: motor,
         puan: puan,
+        mlSkoru: mlSkoru,
         torkMarjiYuzde: torkMarji,
         hizMarjiYuzde: hizMarji,
         avantajlar: avantajlar,

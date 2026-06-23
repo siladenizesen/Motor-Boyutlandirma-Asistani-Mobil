@@ -127,6 +127,29 @@ class _SonucEkraniState extends State<SonucEkrani> {
                         fontWeight: FontWeight.bold,
                         fontSize: 13)),
               ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.psychology_outlined, size: 12, color: Colors.purple.shade700),
+                    const SizedBox(width: 3),
+                    Text(
+                      'ML: ${oneri.mlSkoru.toStringAsFixed(0)}',
+                      style: TextStyle(
+                          color: Colors.purple.shade700,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
             ]),
             const SizedBox(height: 10),
             Wrap(

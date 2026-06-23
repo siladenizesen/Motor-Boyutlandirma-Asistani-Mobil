@@ -3,6 +3,7 @@ import 'motor_model.dart';
 class OneriSonucu {
   final MotorModel motor;
   final double puan;
+  final double mlSkoru;
   final double torkMarjiYuzde;
   final double hizMarjiYuzde;
   final List<String> avantajlar;
@@ -11,6 +12,7 @@ class OneriSonucu {
   OneriSonucu({
     required this.motor,
     required this.puan,
+    required this.mlSkoru,
     required this.torkMarjiYuzde,
     required this.hizMarjiYuzde,
     required this.avantajlar,

@@ -1,0 +1,41 @@
+REFERANS CIKTI (Dart koduna gomulu olan kurallar)
+====================================================
+Bu dosya, lib/services/ml_tahmin_servisi.dart icindeki if-else
+yapisinin kaynagi olan karar agacini belgeler.
+
+Korelasyon (orijinal GB modeli ile): 0.88
+R2 (tree vs GB model ciktisi): 0.77
+
+Agac yapisi (max_depth=4, min_samples_leaf=20):
+
+if (motor_T_nom <= 60.50) {
+  if (T_rms_guvenlikli <= 48.595) {
+    if (motor_P_nom <= 4.00) {
+      if (P_ihtiyac_kW <= 1.585)  -> 25.57
+      else                          -> 4.58
+    } else {
+      if (n_max_ihtiyac <= 2922.00) -> 29.95
+      else                           -> 17.55
+    }
+  } else {
+    if (motor_T_max <= 65.40) {
+      if (motor_T_max <= 30.00) -> 0.94
+      else                       -> 0.29
+    } else {
+      if (T_rms_guvenlikli <= 72.165) -> 4.07
+      else                              -> 0.31
+    }
+  }
+} else {
+  if (n_max_ihtiyac <= 2841.00) {
+    if (P_ihtiyac_kW <= 6.74) {
+      if (n_max_ihtiyac <= 1879.00) -> 34.91
+      else                            -> 51.82
+    } else -> 12.70
+  } else {
+    if (T_amb <= 35.15) {
+      if (T_rms_guvenlikli <= 7.985) -> 0.34
+      else                             -> 0.11
+    } else -> 0.64
+  }
+}

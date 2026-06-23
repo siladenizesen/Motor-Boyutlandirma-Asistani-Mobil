@@ -1,0 +1,43 @@
+{
+  "best_model": "Gradient Boosting",
+  "features": [
+    "motor_T_nom",
+    "motor_T_max",
+    "motor_n_max",
+    "motor_P_nom",
+    "verim_kod",
+    "sinif_kod",
+    "T_cont",
+    "T_peak",
+    "t_cycle",
+    "t_peak",
+    "n_nom_ihtiyac",
+    "n_max_ihtiyac",
+    "T_amb",
+    "SF",
+    "T_rms_guvenlikli",
+    "P_ihtiyac_kW"
+  ],
+  "metrics": [
+    {
+      "Model": "Linear Regression",
+      "RMSE": 24.09,
+      "MAE": 18.63,
+      "R2": 0.1998
+    },
+    {
+      "Model": "Random Forest",
+      "RMSE": 10.98,
+      "MAE": 5.37,
+      "R2": 0.8337
+    },
+    {
+      "Model": "Gradient Boosting",
+      "RMSE": 10.9,
+      "MAE": 5.84,
+      "R2": 0.8361
+    }
+  ],
+  "n_train": 1008,
+  "n_test": 252
+}
