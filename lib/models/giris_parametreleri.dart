@@ -13,6 +13,7 @@ class GirisParametreleri {
   final double reduktorOrani;
   final double mekanikVerim;
   final double guvenlikKatsayisi;
+  final double? girilenGucKw;
 
   GirisParametreleri({
     required this.surekliTorkNm,
@@ -29,5 +30,6 @@ class GirisParametreleri {
     required this.reduktorOrani,
     required this.mekanikVerim,
     required this.guvenlikKatsayisi,
+    this.girilenGucKw,
   });
 }

@@ -67,7 +67,7 @@ class HesaplamaMotoru {
     );
 
     final double guvenlikliT = guvenlikliTork(rms, p.guvenlikKatsayisi);
-    final double ortGuc = ortalamaGuc(rms, motorNomHiz);
+    final double ortGuc = p.girilenGucKw ?? ortalamaGuc(rms, motorNomHiz);
 
     return IhtiyacOzeti(
       motorTarafiSurekliTorkNm: motorSurekliTork,

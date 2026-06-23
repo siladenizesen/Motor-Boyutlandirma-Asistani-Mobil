@@ -18,6 +18,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
   final _tepeTorkCtrl = TextEditingController(text: '60');
   final _cevrimSuresiCtrl = TextEditingController(text: '10');
   final _tepeSuresiCtrl = TextEditingController(text: '3');
+  final _gucCtrl = TextEditingController();
   bool _yukTarafi = true;
 
   final _nominalHizCtrl = TextEditingController(text: '1460');
@@ -65,9 +66,14 @@ class _GirisEkraniState extends State<GirisEkrani> {
         ortamSicakligiC: double.parse(_ortamSicCtrl.text),
         motorSinifi: _motorSinifi,
         reduktorVar: _reduktorVar,
-        reduktorOrani: _reduktorVar ? double.parse(_reduktorOraniCtrl.text) : 1.0,
+        reduktorOrani: _reduktorVar
+            ? double.parse(_reduktorOraniCtrl.text)
+            : 1.0,
         mekanikVerim: _reduktorVar ? double.parse(_mekanikVerimCtrl.text) : 1.0,
         guvenlikKatsayisi: double.parse(_guvenlikCtrl.text),
+        girilenGucKw: _gucCtrl.text.isEmpty
+            ? null
+            : double.tryParse(_gucCtrl.text),
       );
 
       final rapor = HesaplamaMotoru.hesaplaVeOner(giris, motorlar);
@@ -75,10 +81,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => SonucEkrani(
-            rapor: rapor,
-            girisParametreleri: giris,
-          ),
+          builder: (_) => SonucEkrani(rapor: rapor, girisParametreleri: giris),
         ),
       );
     } catch (e) {
@@ -115,18 +118,27 @@ class _GirisEkraniState extends State<GirisEkrani> {
         children: [
           Icon(ikon, color: Colors.blue.shade700, size: 20),
           const SizedBox(width: 8),
-          Text(baslik,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Colors.blue.shade800)),
+          Text(
+            baslik,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: Colors.blue.shade800,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _sayiAlani(String etiket, TextEditingController ctrl,
-      {String? yardimMetni, double? min, double? max}) {
+  Widget _sayiAlani(
+    String etiket,
+    TextEditingController ctrl, {
+    String? yardimMetni,
+    double? min,
+    double? max,
+    bool zorunlu = true,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -139,7 +151,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
         ),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         validator: (v) {
-          if (v == null || v.isEmpty) return 'Zorunlu alan';
+          if (v == null || v.isEmpty) return zorunlu ? 'Zorunlu alan' : null;
           final sayi = double.tryParse(v);
           if (sayi == null) return 'Geçerli bir sayı girin';
           if (min != null && sayi < min) return 'Min: $min';
@@ -176,92 +188,168 @@ class _GirisEkraniState extends State<GirisEkrani> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _bolumBasligi('Görev Profili', Icons.timeline),
-                    _sayiAlani('Sürekli Tork — T_cont (Nm)', _surekliTorkCtrl, min: 0.1),
-                    _sayiAlani('Tepe Tork — T_peak (Nm)', _tepeTorkCtrl, min: 0.1),
-                    _sayiAlani('Toplam Çevrim Süresi — t_cycle (sn)', _cevrimSuresiCtrl,
-                        min: 0.1, yardimMetni: 'Termal hesaplamalar için zorunlu'),
-                    _sayiAlani('Tepe Tork Süresi — t_peak (sn)', _tepeSuresiCtrl, min: 0.01),
+                    _sayiAlani(
+                      'Sürekli Tork — T_cont (Nm)',
+                      _surekliTorkCtrl,
+                      min: 0.1,
+                    ),
+                    _sayiAlani(
+                      'Maksimum Tork — T_max (Nm)',
+                      _tepeTorkCtrl,
+                      min: 0.1,
+                    ),
+                    _sayiAlani(
+                      'Toplam Çevrim Süresi — t_cycle (sn)',
+                      _cevrimSuresiCtrl,
+                      min: 0.1,
+                      yardimMetni: 'Termal hesaplamalar için zorunlu',
+                    ),
+                    _sayiAlani(
+                      'Maksimum Tork Süresi — t_max (sn)',
+                      _tepeSuresiCtrl,
+                      min: 0.01,
+                    ),
+                    _sayiAlani(
+                      'Gerekli Güç — P (kW) (Opsiyonel)',
+                      _gucCtrl,
+                      min: 0.01,
+                      zorunlu: false,
+                      yardimMetni:
+                          'Boş bırakılırsa tork ve hızdan otomatik hesaplanır',
+                    ),
                     Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade400),
-                          borderRadius: BorderRadius.circular(5)),
+                        border: Border.all(color: Colors.grey.shade400),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                       child: SwitchListTile(
-                        title: Text(_yukTarafi
-                            ? 'Referans: YÜK TARAFI'
-                            : 'Referans: MOTOR TARAFI',
-                            style: const TextStyle(fontSize: 14)),
-                        subtitle: const Text('Tork ve hız değerleri hangi mile ait?',
-                            style: TextStyle(fontSize: 12)),
+                        title: Text(
+                          _yukTarafi
+                              ? 'Referans: YÜK TARAFI'
+                              : 'Referans: MOTOR TARAFI',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        subtitle: const Text(
+                          'Tork ve hız değerleri hangi mile ait?',
+                          style: TextStyle(fontSize: 12),
+                        ),
                         value: _yukTarafi,
                         onChanged: (v) => setState(() => _yukTarafi = v),
                         dense: true,
                       ),
                     ),
                     _bolumBasligi('Hız Bilgileri', Icons.speed),
-                    _sayiAlani('Nominal Hız — n_nom (rpm)', _nominalHizCtrl, min: 1),
-                    _sayiAlani('Maksimum Hız — n_max (rpm)', _maxHizCtrl,
-                        min: 1, yardimMetni: 'Sürücü seçimi için gerekli'),
+                    _sayiAlani(
+                      'Nominal Hız — n_nom (rpm)',
+                      _nominalHizCtrl,
+                      min: 1,
+                    ),
+                    _sayiAlani(
+                      'Maksimum Hız — n_max (rpm)',
+                      _maxHizCtrl,
+                      min: 1,
+                      yardimMetni: 'Sürücü seçimi için gerekli',
+                    ),
                     _bolumBasligi('Sistem Koşulları', Icons.settings),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: DropdownButtonFormField<String>(
                         value: _beslemeTipi,
                         decoration: const InputDecoration(
-                            labelText: 'Besleme Tipi',
-                            border: OutlineInputBorder(),
-                            isDense: true),
+                          labelText: 'Besleme Tipi',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
                         items: const [
                           DropdownMenuItem(value: 'DC', child: Text('DC')),
-                          DropdownMenuItem(value: 'AC_tek_faz', child: Text('AC Tek Faz')),
-                          DropdownMenuItem(value: 'AC_uc_faz', child: Text('AC Üç Faz')),
+                          DropdownMenuItem(
+                            value: 'AC_tek_faz',
+                            child: Text('Tek Faz'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'AC_uc_faz',
+                            child: Text('Üç Faz'),
+                          ),
                         ],
                         onChanged: (v) => setState(() => _beslemeTipi = v!),
                       ),
                     ),
-                    _sayiAlani('Ortam Sıcaklığı — T_amb (°C)', _ortamSicCtrl,
-                        min: -20, max: 60, yardimMetni: '>40°C → derating uyarısı'),
+                    _sayiAlani(
+                      'Ortam Sıcaklığı — T_amb (°C)',
+                      _ortamSicCtrl,
+                      min: -20,
+                      max: 60,
+                      yardimMetni: '>40°C → derating uyarısı',
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: DropdownButtonFormField<String>(
                         value: _motorSinifi,
                         decoration: const InputDecoration(
-                            labelText: 'Motor Sınıfı',
-                            border: OutlineInputBorder(),
-                            isDense: true),
+                          labelText: 'Motor Sınıfı',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
                         items: const [
                           DropdownMenuItem(value: 'tumu', child: Text('Tümü')),
-                          DropdownMenuItem(value: 'servo', child: Text('Servo')),
-                          DropdownMenuItem(value: 'asenkron', child: Text('Asenkron')),
+                          DropdownMenuItem(
+                            value: 'servo',
+                            child: Text('Servo'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'asenkron',
+                            child: Text('Asenkron'),
+                          ),
                           DropdownMenuItem(value: 'bldc', child: Text('BLDC')),
                           DropdownMenuItem(value: 'step', child: Text('Step')),
                         ],
                         onChanged: (v) => setState(() => _motorSinifi = v!),
                       ),
                     ),
-                    _bolumBasligi('Mekanik Aktarım', Icons.settings_input_component),
+                    _bolumBasligi(
+                      'Mekanik Aktarım',
+                      Icons.settings_input_component,
+                    ),
                     SwitchListTile(
-                      title: const Text('Redüktör kullanılıyor',
-                          style: TextStyle(fontSize: 14)),
+                      title: const Text(
+                        'Redüktör kullanılıyor',
+                        style: TextStyle(fontSize: 14),
+                      ),
                       value: _reduktorVar,
                       onChanged: (v) => setState(() => _reduktorVar = v),
                       dense: true,
                     ),
                     if (_reduktorVar) ...[
                       const SizedBox(height: 8),
-                      _sayiAlani('Redüksiyon Oranı — i', _reduktorOraniCtrl, min: 1),
-                      _sayiAlani('Mekanik Verim — η (0.0–1.0)', _mekanikVerimCtrl,
-                          min: 0.1, max: 1.0),
+                      _sayiAlani(
+                        'Redüksiyon Oranı — i',
+                        _reduktorOraniCtrl,
+                        min: 1,
+                      ),
+                      _sayiAlani(
+                        'Mekanik Verim — η (0.0–1.0)',
+                        _mekanikVerimCtrl,
+                        min: 0.1,
+                        max: 1.0,
+                      ),
                     ],
                     const SizedBox(height: 8),
-                    _sayiAlani('Güvenlik Katsayısı — SF', _guvenlikCtrl,
-                        min: 1.0, max: 3.0, yardimMetni: 'Tipik değer: 1.25'),
+                    _sayiAlani(
+                      'Güvenlik Katsayısı — SF',
+                      _guvenlikCtrl,
+                      min: 1.0,
+                      max: 3.0,
+                      yardimMetni: 'Tipik değer: 1.25',
+                    ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: _hesaplaVeOner,
                       icon: const Icon(Icons.search),
-                      label: const Text('HESAPLA VE MOTOR ÖNER',
-                          style: TextStyle(fontSize: 16)),
+                      label: const Text(
+                        'HESAPLA VE MOTOR ÖNER',
+                        style: TextStyle(fontSize: 16),
+                      ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(16),
                         backgroundColor: Colors.blue.shade700,
@@ -282,6 +370,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
     _tepeTorkCtrl.dispose();
     _cevrimSuresiCtrl.dispose();
     _tepeSuresiCtrl.dispose();
+    _gucCtrl.dispose();
     _nominalHizCtrl.dispose();
     _maxHizCtrl.dispose();
     _ortamSicCtrl.dispose();
